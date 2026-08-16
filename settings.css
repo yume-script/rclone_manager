@@ -1,0 +1,29 @@
+.rms-root {
+  padding: 12px 4px;
+  font-size: 13px;
+  color: var(--text-color, #e5e7eb);
+}
+.rms-desc {
+  margin: 0 0 10px 0;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+.rms-info-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rms-info-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  opacity: 0.75;
+}
+.rms-info-list i {
+  margin-top: 2px;
+  width: 14px;
+  text-align: center;
+}
