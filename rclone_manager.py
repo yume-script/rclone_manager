@@ -41,14 +41,16 @@ class RcloneManagerMetadataProvider(BaseMetadataProvider):
         "show_sample_update_button": True,
     }
 
-    # dashboard_widget은 정의해두되(설정 화면 등에서 참조될 수 있어) all_desk_tab은
-    # 굳이 켜지 않아도 됩니다 - 실제 풀페이지 진입점은 index.html입니다.
+    # all_desk_tab: True가 있어야 "공통 데스크" 카드가 아니라 독립된 전체화면
+    # 탭(카테고리 풀페이지)으로 렌더링되고, 그 안에서 index.html/script.js가
+    # 쓰입니다. 이게 빠지면 플러그인은 활성화돼도 진입할 화면 자체가 없습니다.
     dashboard_widget = {
         "title": "RCLONE_MANAGER",
         "subtitle": "카테고리별 라이브러리 새로고침 타임테이블",
         "provider": "RCLONE_MANAGER",
         "icon": "fa-solid fa-table-cells",
         "limit": 999,
+        "all_desk_tab": True,
     }
 
     # BookOasis DB 스코프(카테고리) 목록. media_audio 등 스코프가 추가/변경되면
