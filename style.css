@@ -209,12 +209,22 @@
 .rm-edit-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(2, 6, 23, 0.65);
+  background: rgba(2, 6, 23, 0.88) !important;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 20px;
+}
+
+/* .rm-edit-overlay의 display:flex가 [hidden] 속성보다 우선 적용되어 버려서
+   (동일 우선순위에서 저자 스타일이 UA 기본 스타일을 이기기 때문에) 패널이
+   페이지 로드 시부터 항상 떠 있던 버그 수정. hidden이 붙어있으면 무조건
+   숨긴다. */
+.rm-edit-overlay[hidden] {
+  display: none !important;
 }
 
 .rm-edit-panel {
@@ -225,7 +235,7 @@
   background: #10182b;
   border: 1px solid rgba(148, 163, 184, 0.25);
   border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7);
 }
 
 .rm-edit-topbar {
