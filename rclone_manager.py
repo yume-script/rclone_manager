@@ -44,16 +44,14 @@ class RcloneManagerMetadataProvider(BaseMetadataProvider):
         "show_sample_update_button": True,
     }
 
-    # all_desk_tab: True가 있어야 "공통 데스크" 카드가 아니라 독립된 전체화면
-    # 탭(카테고리 풀페이지)으로 렌더링되고, 그 안에서 index.html/script.js가
-    # 쓰입니다. 이게 빠지면 플러그인은 활성화돼도 진입할 화면 자체가 없습니다.
-    dashboard_widget = {
+    # 좌측 사이드바에 독립 카테고리 메뉴로 등록. (plugin_board, jikji_sf와 동일한
+    # 방식) 이 계약이 있어야 index.html/script.js/style.css가 실제로 로드되어
+    # 커스텀 풀페이지(타임테이블)가 렌더링됩니다. dashboard_widget/all_desk_tab은
+    # "플러그인 데스크" 탭용 범용 도서 카드 템플릿이라 이 플러그인엔 필요 없습니다.
+    category_tab = {
         "title": "RCLONE_MANAGER",
-        "subtitle": "카테고리별 라이브러리 새로고침 타임테이블",
-        "provider": "RCLONE_MANAGER",
         "icon": "fa-solid fa-table-cells",
-        "limit": 999,
-        "all_desk_tab": True,
+        "order": 95,
     }
 
     # BookOasis DB 스코프(카테고리) 목록. media_audio 등 스코프가 추가/변경되면
