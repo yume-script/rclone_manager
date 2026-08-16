@@ -19,17 +19,15 @@ from plugins.metadata.base import BaseMetadataProvider
 
 
 class RcloneManagerMetadataProvider(BaseMetadataProvider):
-    id = "RCLONE_MANAGER"
+    id = "rclone_manager"
     name = "RCLONE_MANAGER"
     is_searchable = False
     config_schema = []
 
-    # 자동 업데이트를 쓰지 않을 계획이면 enabled를 False로 바꾸거나
-    # raw_base_url을 실제 리포지토리 경로로 교체해서 사용하세요.
     update_manifest = {
-        "enabled": False,
+        "enabled": True,
         "provider": "github-raw",
-        "raw_base_url": "https://raw.githubusercontent.com/<org>/<repo>/<branch>/plugins/metadata/RCLONE_MANAGER",
+        "raw_base_url": "https://raw.githubusercontent.com/yume-script/rclone_manager/refs/heads/main/",
         "files": [
             "rclone_manager.py",
             "__init__.py",
@@ -77,7 +75,7 @@ class RcloneManagerMetadataProvider(BaseMetadataProvider):
 
     # ------------------------------------------------------------------
     # 풀페이지 뷰(index.html/script.js)가 호출하는 데이터 소스
-    # GET /api/media/dashboard/widgets/RCLONE_MANAGER/data?type=<아무거나>
+    # GET /api/media/dashboard/widgets/rclone_manager/data?type=<아무거나>
     # ------------------------------------------------------------------
     def get_dashboard_data(self, db_type, limit=10):
         items = []
