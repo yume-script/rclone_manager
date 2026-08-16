@@ -1,0 +1,26 @@
+<div class="rm-root">
+  <div class="rm-toolbar">
+    <div class="rm-toolbar-left">
+      <i class="fa-solid fa-table-cells"></i>
+      <span class="rm-title">RCLONE_MANAGER · 새로고침 타임테이블</span>
+    </div>
+    <div class="rm-toolbar-right">
+      <input id="rm-search-input" type="text" placeholder="라이브러리 이름 검색..." />
+      <button id="rm-refresh-btn" type="button" title="새로고침">
+        <i class="fa-solid fa-rotate"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="rm-legend">
+    <span class="rm-legend-item"><i class="rm-dot rm-dot-normal"></i> 정상(단독) 시간대</span>
+    <span class="rm-legend-item"><i class="rm-dot rm-dot-overlap"></i> 겹치는 시간대</span>
+    <span class="rm-legend-item"><i class="fa-solid fa-cloud"></i> 원격(rclone) 마운트</span>
+    <span class="rm-legend-item"><i class="fa-solid fa-arrows-rotate"></i> 스캔 전 VFS refresh</span>
+  </div>
+
+  <div id="rm-status" class="rm-status">불러오는 중...</div>
+  <div id="rm-summary" class="rm-summary"></div>
+
+  <div id="rm-timetable" class="rm-timetable"></div>
+</div>

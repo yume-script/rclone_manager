@@ -1,0 +1,206 @@
+.rm-root {
+  padding: 16px;
+  color: var(--text-color, #e5e7eb);
+  font-size: 14px;
+}
+
+.rm-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.rm-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.rm-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#rm-search-input {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+  min-width: 200px;
+}
+
+#rm-refresh-btn {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+#rm-refresh-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.rm-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 14px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+.rm-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rm-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.rm-dot-normal {
+  background: #10b981;
+}
+.rm-dot-overlap {
+  background: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
+}
+
+.rm-status {
+  margin-bottom: 8px;
+  opacity: 0.75;
+}
+
+.rm-summary {
+  margin-bottom: 14px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+.rm-summary strong {
+  color: #ef4444;
+}
+
+.rm-timetable {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.rm-scope-block {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.rm-scope-header {
+  padding: 8px 12px;
+  font-weight: 600;
+  background: rgba(148, 163, 184, 0.08);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.rm-scope-empty {
+  padding: 12px;
+  opacity: 0.6;
+  font-size: 13px;
+}
+
+/* ---- 시간축 헤더 ---- */
+.rm-axis-row {
+  display: flex;
+  padding: 4px 12px 2px 172px;
+  font-size: 11px;
+  opacity: 0.55;
+}
+.rm-axis-cell {
+  flex: 1;
+  text-align: left;
+}
+
+/* ---- 라이브러리 행 ---- */
+.rm-lib-row {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-top: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.rm-lib-label {
+  width: 160px;
+  min-width: 160px;
+  padding-right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rm-lib-icons {
+  display: inline-flex;
+  gap: 4px;
+  opacity: 0.7;
+  font-size: 11px;
+}
+
+.rm-timeline {
+  position: relative;
+  flex: 1;
+  height: 22px;
+  background: repeating-linear-gradient(
+    to right,
+    rgba(148, 163, 184, 0.12) 0,
+    rgba(148, 163, 184, 0.12) 1px,
+    transparent 1px,
+    transparent calc(100% / 24)
+  );
+  border-radius: 4px;
+}
+
+.rm-marker {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: #10b981;
+  cursor: default;
+}
+.rm-marker.rm-overlap {
+  background: #ef4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.25);
+  animation: rm-pulse 1.6s infinite;
+}
+.rm-marker.rm-many {
+  width: 6px;
+  height: 6px;
+}
+
+@keyframes rm-pulse {
+  0% {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0.08);
+  }
+  100% {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.25);
+  }
+}
+
+.rm-no-schedule {
+  font-size: 11px;
+  opacity: 0.5;
+  padding-left: 4px;
+}
