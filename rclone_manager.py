@@ -74,7 +74,46 @@ class RcloneManagerMetadataProvider(BaseMetadataProvider):
         return []
 
     def apply(self, db_type, book_id, item_data):
-        return False, "RCLONE_MANAGER는 대시보드(타임테이블) 전용 플러그인입니다."
+        """book_id=0으로 호출되는 범용 액션 채널 (plugin_board와 동일한 패턴).
+        item_data = {"action": "update_cron", "scope": ..., "id": ..., "cron_schedule": ...}
+        """
+        try:
+            return self._dispatch_apply(item_data)
+        except Exception as exc:  # noqa: BLE001
+            return False, "예상치 못한 오류가 발생했습니다: %s" % exc
+
+    def _dispatch_apply(self, item_data):
+        if not isinstance(item_data, dict):
+            return False, "유효하지 않은 요청 데이터 형식입니다."
+
+        action = str(item_data.get("action", "")).strip()
+        if action != "update_cron":
+            return False, "지원하지 않는 action입니다: %s" % action
+
+        scope_key = str(item_data.get("scope", "")).strip()
+        valid_scopes = {s["key"] for s in self.SCOPES}
+        if scope_key not in valid_scopes:
+            return False, "유효하지 않은 스코프입니다: %s" % scope_key
+
+        try:
+            library_id = int(item_data.get("id"))
+        except (TypeError, ValueError):
+            return False, "유효하지 않은 라이브러리 ID입니다."
+
+        cron_schedule = str(item_data.get("cron_schedule", "")).strip()
+        if not cron_schedule or len(cron_schedule.split()) < 5:
+            return False, "유효하지 않은 cron 표현식입니다: %s" % cron_schedule
+
+        try:
+            gateway = self.get_db_gateway(scope_key)
+            gateway.execute(
+                "UPDATE libraries SET cron_schedule = %s WHERE id = %s",
+                (cron_schedule, library_id),
+            )
+        except Exception as exc:  # noqa: BLE001
+            return False, "저장 중 오류가 발생했습니다: %s" % exc
+
+        return True, "스케줄이 저장되었습니다 (%s)" % cron_schedule
 
     # ------------------------------------------------------------------
     # 풀페이지 뷰(index.html/script.js)가 호출하는 데이터 소스

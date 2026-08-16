@@ -23,4 +23,72 @@
   <div id="rm-summary" class="rm-summary"></div>
 
   <div id="rm-timetable" class="rm-timetable"></div>
+
+  <!-- 스케줄 편집 패널 (연필 아이콘 클릭 시 오픈, 기본 숨김) -->
+  <div id="rm-edit-overlay" class="rm-edit-overlay" hidden>
+    <div class="rm-edit-panel">
+      <div class="rm-edit-topbar">
+        <div class="rm-edit-title">
+          <i class="fa-solid fa-pen"></i>
+          <span id="rm-edit-libname">라이브러리</span>
+        </div>
+        <div class="rm-edit-actions">
+          <button id="rm-edit-save-btn" type="button" class="rm-btn-primary">
+            <i class="fa-solid fa-floppy-disk"></i> 저장
+          </button>
+          <button id="rm-edit-close-btn" type="button" class="rm-btn-ghost" title="닫기">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="rm-edit-body">
+        <div class="rm-helper-title">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> 스케줄 도우미
+          <span class="rm-helper-hint">쉬운 설정을 Cron식으로 자동 변환</span>
+        </div>
+
+        <div class="rm-helper-grid">
+          <div class="rm-field">
+            <label>반복 유형</label>
+            <select id="rm-repeat-type">
+              <option value="daily">매일</option>
+              <option value="weekly">매주 특정 요일</option>
+              <option value="manual">직접 입력 (Cron)</option>
+            </select>
+          </div>
+          <div class="rm-field" id="rm-time-field">
+            <label>실행 시간</label>
+            <input type="time" id="rm-repeat-time" value="03:00" />
+          </div>
+        </div>
+
+        <div class="rm-field" id="rm-dow-field">
+          <label>요일</label>
+          <select id="rm-repeat-dow">
+            <option value="0">일요일</option>
+            <option value="1">월요일</option>
+            <option value="2">화요일</option>
+            <option value="3">수요일</option>
+            <option value="4">목요일</option>
+            <option value="5">금요일</option>
+            <option value="6">토요일</option>
+          </select>
+        </div>
+
+        <div class="rm-summary-line" id="rm-helper-summary"></div>
+
+        <div class="rm-field">
+          <label>Cron식</label>
+          <input type="text" id="rm-cron-text" spellcheck="false" />
+        </div>
+
+        <div id="rm-save-error" class="rm-save-error" hidden></div>
+
+        <div class="rm-edit-preview-label">
+          <i class="fa-solid fa-eye"></i> 미리보기 (저장 전 · 타임테이블에 바로 반영됨)
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

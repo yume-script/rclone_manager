@@ -204,3 +204,183 @@
   opacity: 0.5;
   padding-left: 4px;
 }
+
+/* ==================== 스케줄 편집 패널 ==================== */
+.rm-edit-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.rm-edit-panel {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #10182b;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+.rm-edit-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  position: sticky;
+  top: 0;
+  background: #10182b;
+  border-radius: 12px 12px 0 0;
+}
+
+.rm-edit-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.rm-edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rm-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #7c3aed;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+}
+.rm-btn-primary:hover {
+  background: #6d28d9;
+}
+.rm-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.rm-btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: inherit;
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+.rm-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.rm-edit-body {
+  padding: 16px;
+}
+
+.rm-helper-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.rm-helper-hint {
+  margin-left: auto;
+  font-size: 11.5px;
+  opacity: 0.55;
+  font-weight: 400;
+}
+
+.rm-helper-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.rm-field {
+  margin-bottom: 12px;
+}
+.rm-field label {
+  display: block;
+  font-size: 12px;
+  opacity: 0.7;
+  margin-bottom: 4px;
+}
+.rm-field select,
+.rm-field input[type="time"],
+.rm-field input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+  font-size: 13.5px;
+}
+
+.rm-summary-line {
+  font-size: 12.5px;
+  color: #93c5fd;
+  margin: -4px 0 14px 0;
+  min-height: 16px;
+}
+
+.rm-save-error {
+  font-size: 12.5px;
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+}
+
+.rm-edit-preview-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  opacity: 0.6;
+  margin: 6px 0 4px 0;
+}
+
+/* 메인 타임테이블에서 지금 편집 중인 행 강조 */
+.rm-lib-row.rm-editing {
+  background: rgba(124, 58, 237, 0.12);
+  border-radius: 6px;
+}
+.rm-lib-row.rm-editing .rm-marker {
+  background: #a78bfa;
+  box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.3);
+}
+
+.rm-edit-btn {
+  border: none;
+  background: transparent;
+  color: inherit;
+  opacity: 0.55;
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 11px;
+}
+.rm-edit-btn:hover {
+  opacity: 1;
+}
