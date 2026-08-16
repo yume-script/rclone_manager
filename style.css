@@ -484,12 +484,18 @@
 
 .rm-grid-cell {
   min-width: 92px;
-  max-height: 78px;
+  max-height: 46px;
   overflow-y: auto;
 }
 .rm-grid-cell.rm-grid-overlap {
   background: rgba(239, 68, 68, 0.1);
   box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.45);
+}
+
+/* 매 정시(00분) 행 위쪽에 살짝 진한 구분선을 넣어 30분 단위 표에서도
+   시간 경계를 한눈에 알아보기 쉽게 한다 */
+.rm-grid-row.rm-grid-hour-start td {
+  border-top: 1px solid rgba(148, 163, 184, 0.3);
 }
 
 .rm-grid-chip {

@@ -319,13 +319,16 @@
       return wrapper;
     }
 
-    const grid = {}; // "dow:hour" -> [item, ...] (같은 항목 중복 없이)
+    // "dow:slot" -> [item, ...] (같은 항목 중복 없이). slot = hour*2 + (0|1),
+    // 30분 단위(00분/30분)로 쪼갠 인덱스(0~47).
+    const grid = {};
     items.forEach((item) => {
       const seenKeys = new Set();
       (item._times || []).forEach((t) => {
+        const slot = t.hour * 2 + (t.minute >= 30 ? 1 : 0);
         const days = t.dow === null ? [0, 1, 2, 3, 4, 5, 6] : [t.dow];
         days.forEach((d) => {
-          const key = `${d}:${t.hour}`;
+          const key = `${d}:${slot}`;
           if (seenKeys.has(key)) return;
           seenKeys.add(key);
           if (!grid[key]) grid[key] = [];
@@ -344,11 +347,13 @@
     table.appendChild(thead);
 
     const tbody = el('tbody');
-    for (let h = 0; h < 24; h += 1) {
-      const row = el('tr');
-      row.appendChild(el('td', 'rm-grid-hourcol', `${pad2(h)}시`));
+    for (let slot = 0; slot < 48; slot += 1) {
+      const h = Math.floor(slot / 2);
+      const m = slot % 2 === 0 ? '00' : '30';
+      const row = el('tr', 'rm-grid-row' + (m === '00' ? ' rm-grid-hour-start' : ''));
+      row.appendChild(el('td', 'rm-grid-hourcol', `${pad2(h)}:${m}`));
       GRID_DAYS.forEach((d) => {
-        const key = `${d.dow}:${h}`;
+        const key = `${d.dow}:${slot}`;
         const cellItems = grid[key] || [];
         const td = el('td', 'rm-grid-cell' + (cellItems.length > 1 ? ' rm-grid-overlap' : ''));
         cellItems.forEach((it) => {
@@ -357,7 +362,7 @@
           const color = SCOPE_COLORS[it.scope] || '#94a3b8';
           chip.style.background = hexToRgba(color, 0.22);
           chip.style.color = color;
-          chip.title = `${it.scope_label || it.scope} · ${it.name} · ${d.label}요일 ${pad2(h)}시`;
+          chip.title = `${it.scope_label || it.scope} · ${it.name} · ${d.label}요일 ${pad2(h)}:${m}`;
           chip.addEventListener('click', () => openEditPanel(it));
           td.appendChild(chip);
         });
