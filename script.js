@@ -48,7 +48,21 @@
     return Array.from(new Set(result)).sort((a, b) => a - b);
   }
 
-  // cron 문자열 -> [{hour, minute}, ...]. 파싱 실패/빈 값이면 빈 배열.
+  // 요일별 색상 (겹침 여부와 무관하게 항상 이 색으로 표시, 겹치면 빨간 테두리 추가)
+  const DOW_COLORS = {
+    null: '#94a3b8', // 매일(요일 필드가 *) - 슬레이트
+    0: '#ef4444', // 일요일 - 빨강
+    1: '#f97316', // 월요일 - 주황
+    2: '#eab308', // 화요일 - 노랑
+    3: '#22c55e', // 수요일 - 초록
+    4: '#06b6d4', // 목요일 - 청록
+    5: '#3b82f6', // 금요일 - 파랑
+    6: '#a855f7', // 토요일 - 보라
+  };
+  const DOW_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
+
+  // cron 문자열 -> [{hour, minute, dow}, ...]. dow는 0~6 또는 요일필드가 '*'
+  // (매일)이면 null. 파싱 실패/빈 값이면 빈 배열.
   function cronToTimes(cronStr) {
     if (!cronStr || typeof cronStr !== 'string') return [];
     const fields = cronStr.trim().split(/\s+/);
@@ -56,10 +70,17 @@
     try {
       const minutes = parseCronField(fields[0], 0, 59);
       const hours = parseCronField(fields[1], 0, 23);
+      const dowField = fields.length >= 5 ? fields[4] : '*';
+      // 요일필드가 '*'이면 "매일" 하나로 취급(dow=null). 아니면 지정된 요일마다
+      // 별개의 발생(occurrence)으로 전개한다.
+      const dowValues = !dowField || dowField === '*' ? [null] : parseCronField(dowField, 0, 6);
+
       const times = [];
       hours.forEach((h) => {
         minutes.forEach((m) => {
-          times.push({ hour: h, minute: m });
+          dowValues.forEach((d) => {
+            times.push({ hour: h, minute: m, dow: d });
+          });
         });
       });
       return times;
@@ -89,28 +110,47 @@
     return item._pendingCron != null ? item._pendingCron : item.cron_schedule;
   }
 
+  // 두 발생(occurrence)이 실제로 같은 날 겹치는지: 요일이 같거나(dow===dow),
+  // 둘 중 하나라도 "매일"(dow=null)이면 그 요일과는 항상 겹친다.
+  function sameDay(d1, d2) {
+    if (d1 === null || d2 === null) return true;
+    return d1 === d2;
+  }
+
   // ------------------------------------------------------------------
   // 겹침 계산: scope 구분 없이 전체(같은 서버/스토리지 자원을 공유한다고
-  // 가정)에서 동일 hour:minute에 2개 이상 라이브러리가 몰리면 "겹침"으로 표시.
-  // 편집 중인 항목은 미리보기(pending) 값 기준으로 계산해 실시간 반영.
+  // 가정)에서 같은 요일 + 같은 hour:minute에 2개 이상 라이브러리가 몰리면
+  // "겹침"으로 표시. 요일이 다르면(예: 일요일 03:00 vs 월요일 03:00) 시:분이
+  // 같아도 겹침으로 보지 않는다. 편집 중인 항목은 미리보기(pending) 값 기준.
+  // 겹침 결과는 각 occurrence 객체(t)에 t.isOverlap으로 직접 표시해둔다.
   // ------------------------------------------------------------------
   function computeOverlapMap(items) {
-    const timeMap = new Map();
+    const occurrences = []; // [{item, t}, ...] 전체 발생 목록 (너무 촘촘한 cron은 제외)
     items.forEach((item) => {
       const times = cronToTimes(effectiveCron(item));
       item._times = times;
-      if (times.length > 96) return;
+      if (times.length > 96) return; // 매우 잦은 주기는 겹침 판정에서 제외
       times.forEach((t) => {
-        const key = `${t.hour}:${t.minute}`;
-        if (!timeMap.has(key)) timeMap.set(key, []);
-        timeMap.get(key).push(item.name);
+        t.isOverlap = false;
+        occurrences.push({ item, t });
       });
     });
-    const overlapKeys = new Set();
-    timeMap.forEach((names, key) => {
-      if (names.length > 1) overlapKeys.add(key);
-    });
-    return overlapKeys;
+
+    let overlapCount = 0;
+    for (let i = 0; i < occurrences.length; i += 1) {
+      for (let j = i + 1; j < occurrences.length; j += 1) {
+        const a = occurrences[i];
+        const b = occurrences[j];
+        if (a.item === b.item) continue; // 같은 라이브러리 내부 발생끼리는 비교 안 함
+        if (a.t.hour !== b.t.hour || a.t.minute !== b.t.minute) continue;
+        if (!sameDay(a.t.dow, b.t.dow)) continue;
+        if (!a.t.isOverlap) overlapCount += 1;
+        if (!b.t.isOverlap) overlapCount += 1;
+        a.t.isOverlap = true;
+        b.t.isOverlap = true;
+      }
+    }
+    return overlapCount;
   }
 
   function renderAxis() {
@@ -121,7 +161,7 @@
     return row;
   }
 
-  function renderTimeline(item, overlapKeys) {
+  function renderTimeline(item) {
     const timeline = el('div', 'rm-timeline');
     const times = item._times || [];
     const cronStr = effectiveCron(item);
@@ -152,14 +192,14 @@
     }
 
     times.forEach((t) => {
-      const key = `${t.hour}:${t.minute}`;
-      const isOverlap = overlapKeys.has(key);
-      const marker = el('div', 'rm-marker' + (isOverlap ? ' rm-overlap' : ''));
+      const marker = el('div', 'rm-marker' + (t.isOverlap ? ' rm-overlap' : ''));
       if (times.length > 12) marker.classList.add('rm-many');
+      marker.style.backgroundColor = DOW_COLORS[t.dow];
       const pct = ((t.hour * 60 + t.minute) / 1440) * 100;
       marker.style.left = `${pct}%`;
-      marker.title = `${item.name} · ${pad2(t.hour)}:${pad2(t.minute)}${
-        isOverlap ? ' (다른 라이브러리와 겹침)' : ''
+      const dayText = t.dow === null ? '매일' : `${DOW_LABELS[t.dow]}요일`;
+      marker.title = `${item.name} · ${dayText} ${pad2(t.hour)}:${pad2(t.minute)}${
+        t.isOverlap ? ' (같은 요일·시간에 다른 라이브러리와 겹침)' : ''
       }`;
       timeline.appendChild(marker);
     });
@@ -167,7 +207,7 @@
     return timeline;
   }
 
-  function renderLibRow(item, overlapKeys) {
+  function renderLibRow(item) {
     const isEditing = currentEditItem && itemKey(currentEditItem) === itemKey(item);
     const row = el('div', 'rm-lib-row' + (isEditing ? ' rm-editing' : ''));
 
@@ -197,7 +237,7 @@
     label.appendChild(icons);
 
     row.appendChild(label);
-    row.appendChild(renderTimeline(item, overlapKeys));
+    row.appendChild(renderTimeline(item));
     return row;
   }
 
@@ -207,7 +247,7 @@
     if (!container_) return;
     container_.innerHTML = '';
 
-    const overlapKeys = computeOverlapMap(items);
+    const overlapCount = computeOverlapMap(items);
 
     const scopeOrder = [];
     const byScope = new Map();
@@ -220,7 +260,6 @@
     });
 
     if (summary) {
-      const overlapCount = overlapKeys.size;
       summary.innerHTML = '';
       const text = el('span', null, `전체 라이브러리 ${items.length}개 · 겹치는 시간대 `);
       const strong = el('strong', null, `${overlapCount}건`);
@@ -245,7 +284,7 @@
       } else {
         block.appendChild(renderAxis());
         scopeItems.forEach((item) => {
-          block.appendChild(renderLibRow(item, overlapKeys));
+          block.appendChild(renderLibRow(item));
         });
       }
 
