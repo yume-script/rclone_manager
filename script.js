@@ -1,9 +1,9 @@
-// RCLONE_MANAGER 플러그인 풀페이지 스크립트
+// scan_scheduler 플러그인 풀페이지 스크립트
 // jikji_sf와 동일하게 new Function('pluginId', 'container', ...)로 실행되므로
 // import 없이 전역 API + 인자로 받는 pluginId/container만 사용합니다.
 
 (function () {
-  const LOG_PREFIX = '[RCLONE_MANAGER]';
+  const LOG_PREFIX = '[scan_scheduler]';
   console.log(LOG_PREFIX, '0/3 Fullpage Timetable UI loaded.');
 
   let allItems = [];
