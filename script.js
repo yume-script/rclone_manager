@@ -9,6 +9,24 @@
   let allItems = [];
   let currentEditItem = null; // 지금 편집 패널에서 다루고 있는 item (allItems의 원소 참조)
   let helperListenersBound = false;
+  let viewMode = 'grid'; // 'grid' (요일×시간) | 'timeline' (라이브러리별)
+
+  const SCOPE_COLORS = {
+    general: '#3b82f6',
+    adult: '#ec4899',
+    audio: '#22c55e',
+  };
+
+  // 그리드 뷰의 요일 컬럼 순서(월~일). dow는 cron 표준(0=일요일)의 값.
+  const GRID_DAYS = [
+    { label: '월', dow: 1 },
+    { label: '화', dow: 2 },
+    { label: '수', dow: 3 },
+    { label: '목', dow: 4 },
+    { label: '금', dow: 5 },
+    { label: '토', dow: 6 },
+    { label: '일', dow: 0 },
+  ];
 
   // ------------------------------------------------------------------
   // cron 파싱 (분/시 필드만 사용, 표준 5필드 cron 가정: 분 시 일 월 요일)
@@ -241,14 +259,7 @@
     return row;
   }
 
-  function renderTimetable(items) {
-    const container_ = container.querySelector('#rm-timetable');
-    const summary = container.querySelector('#rm-summary');
-    if (!container_) return;
-    container_.innerHTML = '';
-
-    const overlapCount = computeOverlapMap(items);
-
+  function renderTimelineInto(container_, items) {
     const scopeOrder = [];
     const byScope = new Map();
     items.forEach((item) => {
@@ -258,14 +269,6 @@
       }
       byScope.get(item.scope).push(item);
     });
-
-    if (summary) {
-      summary.innerHTML = '';
-      const text = el('span', null, `전체 라이브러리 ${items.length}개 · 겹치는 시간대 `);
-      const strong = el('strong', null, `${overlapCount}건`);
-      summary.appendChild(text);
-      summary.appendChild(strong);
-    }
 
     scopeOrder.forEach((firstItem) => {
       const scopeKey = firstItem.scope;
@@ -296,13 +299,123 @@
     }
   }
 
+  function hexToRgba(hex, alpha) {
+    const h = (hex || '#64748b').replace('#', '');
+    const num = parseInt(h, 16);
+    const r = (num >> 16) & 255;
+    const g = (num >> 8) & 255;
+    const b = num & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  // 요일(월~일) x 24시간 매트릭스 뷰. item._times(computeOverlapMap가 이미
+  // 채워둔 값, dow/hour/minute 포함)를 그대로 재사용해 셀별로 묶는다.
+  // "매일"(dow=null) 스케줄은 7개 요일 칸 모두에 나타난다.
+  function renderGridTable(items) {
+    const wrapper = el('div', 'rm-grid-wrapper');
+
+    if (items.length === 0) {
+      wrapper.appendChild(el('div', 'rm-scope-empty', '표시할 라이브러리가 없습니다.'));
+      return wrapper;
+    }
+
+    const grid = {}; // "dow:hour" -> [item, ...] (같은 항목 중복 없이)
+    items.forEach((item) => {
+      const seenKeys = new Set();
+      (item._times || []).forEach((t) => {
+        const days = t.dow === null ? [0, 1, 2, 3, 4, 5, 6] : [t.dow];
+        days.forEach((d) => {
+          const key = `${d}:${t.hour}`;
+          if (seenKeys.has(key)) return;
+          seenKeys.add(key);
+          if (!grid[key]) grid[key] = [];
+          grid[key].push(item);
+        });
+      });
+    });
+
+    const table = el('table', 'rm-grid-table');
+
+    const thead = el('thead');
+    const headRow = el('tr');
+    headRow.appendChild(el('th', 'rm-grid-corner', '시간'));
+    GRID_DAYS.forEach((d) => headRow.appendChild(el('th', 'rm-grid-daycol', `${d.label}요일`)));
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    const tbody = el('tbody');
+    for (let h = 0; h < 24; h += 1) {
+      const row = el('tr');
+      row.appendChild(el('td', 'rm-grid-hourcol', `${pad2(h)}시`));
+      GRID_DAYS.forEach((d) => {
+        const key = `${d.dow}:${h}`;
+        const cellItems = grid[key] || [];
+        const td = el('td', 'rm-grid-cell' + (cellItems.length > 1 ? ' rm-grid-overlap' : ''));
+        cellItems.forEach((it) => {
+          const isEditing = currentEditItem && itemKey(currentEditItem) === itemKey(it);
+          const chip = el('span', 'rm-grid-chip' + (isEditing ? ' rm-grid-chip-editing' : ''), it.name);
+          const color = SCOPE_COLORS[it.scope] || '#94a3b8';
+          chip.style.background = hexToRgba(color, 0.22);
+          chip.style.color = color;
+          chip.title = `${it.scope_label || it.scope} · ${it.name} · ${d.label}요일 ${pad2(h)}시`;
+          chip.addEventListener('click', () => openEditPanel(it));
+          td.appendChild(chip);
+        });
+        row.appendChild(td);
+      });
+      tbody.appendChild(row);
+    }
+    table.appendChild(tbody);
+
+    wrapper.appendChild(table);
+    return wrapper;
+  }
+
+  // 뷰 모드(그리드/타임라인)에 따라 실제 렌더링을 위임하는 진입점.
+  function renderActive(items) {
+    const container_ = container.querySelector('#rm-timetable');
+    const summary = container.querySelector('#rm-summary');
+    if (!container_) return;
+
+    const overlapCount = computeOverlapMap(items); // item._times도 함께 채워짐(두 뷰 공용)
+
+    if (summary) {
+      summary.innerHTML = '';
+      const text = el('span', null, `전체 라이브러리 ${items.length}개 · 겹치는 시간대 `);
+      const strong = el('strong', null, `${overlapCount}건`);
+      summary.appendChild(text);
+      summary.appendChild(strong);
+    }
+
+    container_.innerHTML = '';
+    if (viewMode === 'grid') {
+      container_.appendChild(renderGridTable(items));
+    } else {
+      renderTimelineInto(container_, items);
+    }
+  }
+
   function applyFilter() {
     const searchInput = container.querySelector('#rm-search-input');
     const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
     const filtered = query
       ? allItems.filter((item) => (item.name || '').toLowerCase().includes(query))
       : allItems;
-    renderTimetable(filtered);
+    renderActive(filtered);
+  }
+
+  function setViewMode(mode) {
+    if (viewMode === mode) return;
+    viewMode = mode;
+    const gridBtn = container.querySelector('#rm-view-grid-btn');
+    const timelineBtn = container.querySelector('#rm-view-timeline-btn');
+    const gridLegend = container.querySelector('#rm-grid-legend');
+    const timelineLegend = container.querySelector('#rm-timeline-legend');
+    gridBtn.classList.toggle('active', mode === 'grid');
+    timelineBtn.classList.toggle('active', mode === 'timeline');
+    gridLegend.hidden = mode !== 'grid';
+    timelineLegend.hidden = mode !== 'timeline';
+    applyFilter();
   }
 
   // ==================================================================
@@ -559,6 +672,15 @@
   const refreshBtn = container.querySelector('#rm-refresh-btn');
   if (refreshBtn) {
     refreshBtn.addEventListener('click', fetchSchedules);
+  }
+
+  const viewGridBtn = container.querySelector('#rm-view-grid-btn');
+  if (viewGridBtn) {
+    viewGridBtn.addEventListener('click', () => setViewMode('grid'));
+  }
+  const viewTimelineBtn = container.querySelector('#rm-view-timeline-btn');
+  if (viewTimelineBtn) {
+    viewTimelineBtn.addEventListener('click', () => setViewMode('timeline'));
   }
 
   fetchSchedules();

@@ -5,6 +5,14 @@
       <span class="rm-title">RCLONE_MANAGER · 새로고침 타임테이블</span>
     </div>
     <div class="rm-toolbar-right">
+      <div class="rm-view-toggle" role="group">
+        <button id="rm-view-grid-btn" type="button" class="rm-view-btn active">
+          <i class="fa-solid fa-border-all"></i> 요일×시간
+        </button>
+        <button id="rm-view-timeline-btn" type="button" class="rm-view-btn">
+          <i class="fa-solid fa-list"></i> 라이브러리별
+        </button>
+      </div>
       <input id="rm-search-input" type="text" placeholder="라이브러리 이름 검색..." />
       <button id="rm-refresh-btn" type="button" title="새로고침">
         <i class="fa-solid fa-rotate"></i>
@@ -12,7 +20,13 @@
     </div>
   </div>
 
-  <div class="rm-legend">
+  <div id="rm-grid-legend" class="rm-legend">
+    <span class="rm-legend-item"><i class="rm-dot" style="background:#3b82f6"></i> 일반(general)</span>
+    <span class="rm-legend-item"><i class="rm-dot" style="background:#ec4899"></i> 성인(adult)</span>
+    <span class="rm-legend-item"><i class="rm-dot" style="background:#22c55e"></i> 오디오(audio)</span>
+    <span class="rm-legend-item rm-legend-sep"><i class="rm-dot rm-dot-overlap"></i> 같은 칸에 2개 이상 겹침</span>
+  </div>
+  <div id="rm-timeline-legend" class="rm-legend" hidden>
     <span class="rm-legend-item"><i class="rm-dot" style="background:#94a3b8"></i> 매일</span>
     <span class="rm-legend-item"><i class="rm-dot" style="background:#ef4444"></i> 일</span>
     <span class="rm-legend-item"><i class="rm-dot" style="background:#f97316"></i> 월</span>

@@ -398,3 +398,115 @@
 .rm-edit-btn:hover {
   opacity: 1;
 }
+
+/* ==================== 뷰 토글 버튼 ==================== */
+.rm-view-toggle {
+  display: inline-flex;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.rm-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  opacity: 0.65;
+  padding: 6px 10px;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.rm-view-btn + .rm-view-btn {
+  border-left: 1px solid rgba(148, 163, 184, 0.35);
+}
+.rm-view-btn.active {
+  opacity: 1;
+  background: rgba(124, 58, 237, 0.25);
+  color: #ddd6fe;
+}
+.rm-view-btn:hover {
+  opacity: 1;
+}
+
+/* ==================== 요일 x 시간 그리드 뷰 ==================== */
+.rm-grid-wrapper {
+  overflow-x: auto;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 10px;
+}
+
+.rm-grid-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  font-size: 11.5px;
+  table-layout: fixed;
+}
+
+.rm-grid-table th,
+.rm-grid-table td {
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  padding: 3px 4px;
+  vertical-align: top;
+  text-align: left;
+}
+
+.rm-grid-corner,
+.rm-grid-daycol {
+  position: sticky;
+  top: 0;
+  background: #0d1526;
+  z-index: 2;
+  font-weight: 600;
+  text-align: center;
+  padding: 6px 4px;
+  opacity: 0.85;
+}
+
+.rm-grid-hourcol {
+  position: sticky;
+  left: 0;
+  background: #0d1526;
+  z-index: 1;
+  width: 56px;
+  min-width: 56px;
+  text-align: center;
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+}
+
+.rm-grid-corner {
+  left: 0;
+  z-index: 3;
+}
+
+.rm-grid-cell {
+  min-width: 92px;
+  max-height: 78px;
+  overflow-y: auto;
+}
+.rm-grid-cell.rm-grid-overlap {
+  background: rgba(239, 68, 68, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.45);
+}
+
+.rm-grid-chip {
+  display: block;
+  padding: 1px 5px;
+  margin-bottom: 2px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 11px;
+}
+.rm-grid-chip:hover {
+  filter: brightness(1.25);
+}
+.rm-grid-chip-editing {
+  outline: 2px solid #a78bfa;
+  outline-offset: 1px;
+}
