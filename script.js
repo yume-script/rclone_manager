@@ -362,9 +362,32 @@
           const color = SCOPE_COLORS[it.scope] || '#94a3b8';
           chip.style.background = hexToRgba(color, 0.22);
           chip.style.color = color;
-          chip.title = `${it.scope_label || it.scope} · ${it.name} · ${d.label}요일 ${pad2(h)}:${m}`;
+          chip.title = `${it.scope_label || it.scope} · ${it.name} · ${d.label}요일 ${pad2(h)}:${m} (드래그해서 이동 가능)`;
+          chip.draggable = true;
           chip.addEventListener('click', () => openEditPanel(it));
+          chip.addEventListener('dragstart', (evt) => {
+            evt.dataTransfer.setData('text/plain', itemKey(it));
+            evt.dataTransfer.effectAllowed = 'move';
+            chip.classList.add('rm-dragging');
+          });
+          chip.addEventListener('dragend', () => {
+            chip.classList.remove('rm-dragging');
+          });
           td.appendChild(chip);
+        });
+        const minuteVal = m === '00' ? 0 : 30;
+        td.addEventListener('dragover', (evt) => {
+          evt.preventDefault();
+          evt.dataTransfer.dropEffect = 'move';
+          td.classList.add('rm-grid-drop-target');
+        });
+        td.addEventListener('dragleave', () => {
+          td.classList.remove('rm-grid-drop-target');
+        });
+        td.addEventListener('drop', (evt) => {
+          evt.preventDefault();
+          td.classList.remove('rm-grid-drop-target');
+          handleGridDrop(evt.dataTransfer.getData('text/plain'), d.dow, h, minuteVal);
         });
         row.appendChild(td);
       });
@@ -557,6 +580,33 @@
 
     container.querySelector('#rm-edit-overlay').hidden = false;
     applyFilter();
+  }
+
+  // 그리드 뷰에서 라이브러리 칩을 다른 칸(요일/시간)에 드롭했을 때 호출.
+  // 즉시 저장하지 않고, 편집 패널을 그 위치(매주 특정 요일)로 미리 채운 뒤
+  // 미리보기만 반영한다 - 실수 방지를 위해 저장은 사용자가 직접 눌러야 함.
+  function handleGridDrop(draggedKey, targetDow, targetHour, targetMinute) {
+    if (!draggedKey) return;
+    const item = allItems.find((it) => itemKey(it) === draggedKey);
+    if (!item) return;
+
+    if (!currentEditItem || itemKey(currentEditItem) !== draggedKey) {
+      openEditPanel(item);
+    }
+
+    const typeSel = container.querySelector('#rm-repeat-type');
+    const timeInput = container.querySelector('#rm-repeat-time');
+    const dowSel = container.querySelector('#rm-repeat-dow');
+
+    typeSel.value = 'weekly';
+    timeInput.value = `${pad2(targetHour)}:${pad2(targetMinute)}`;
+    dowSel.value = String(targetDow);
+
+    onHelperChanged(); // pendingCron 재계산 + 요약 갱신 + 타임테이블 실시간 미리보기
+    console.log(
+      LOG_PREFIX,
+      `드래그 이동 미리보기: ${item.name} -> ${DOW_LABELS[targetDow]}요일 ${pad2(targetHour)}:${pad2(targetMinute)} (저장 버튼을 눌러야 확정됨)`
+    );
   }
 
   function closeEditPanel(discardPending) {

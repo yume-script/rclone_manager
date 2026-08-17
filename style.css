@@ -516,3 +516,19 @@
   outline: 2px solid #a78bfa;
   outline-offset: 1px;
 }
+
+/* ==================== 드래그 앤 드롭 (그리드 뷰) ==================== */
+.rm-grid-chip {
+  cursor: grab;
+}
+.rm-grid-chip:active {
+  cursor: grabbing;
+}
+.rm-grid-chip.rm-dragging {
+  opacity: 0.35;
+}
+.rm-grid-cell.rm-grid-drop-target {
+  outline: 2px dashed #a78bfa;
+  outline-offset: -2px;
+  background: rgba(124, 58, 237, 0.18);
+}
