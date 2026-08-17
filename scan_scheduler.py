@@ -52,6 +52,7 @@ class ScanSchedulerMetadataProvider(BaseMetadataProvider):
         "title": "스캔 스케줄러",
         "icon": "fa-solid fa-table-cells",
         "order": 95,
+        "sessions": "all",
     }
 
     # BookOasis DB 스코프(카테고리) 목록. media_audiobook 등 스코프가 추가/변경되면
