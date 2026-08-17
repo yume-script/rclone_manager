@@ -2,7 +2,7 @@
 """
 scan_scheduler (스캔 스케줄러)
 --------------
-BookOasis 카테고리(DB 스코프: general/adult/audiobook) 하단 개별 라이브러리의
+BookOasis 카테고리(DB 스코프: general/adult/audiobook/video) 하단 개별 라이브러리의
 refresh(cron) 스케줄을 한 화면(타임테이블)에서 보여주고, 겹치는 시간대를
 시각적으로 표시하기 위한 대시보드 전용 플러그인입니다.
 
@@ -10,7 +10,7 @@ refresh(cron) 스케줄을 한 화면(타임테이블)에서 보여주고, 겹�
 - 스케줄 데이터는 REST API가 아니라 플러그인 표준 계약인
   self.get_db_gateway(scope)를 통해 DB에서 직접 조회합니다.
 - get_dashboard_data()는 core가 넘겨주는 db_type(단일 스코프)을 무시하고,
-  general/adult/audiobook 3개 스코프를 모두 순회해 하나의 리스트로 합쳐 반환합니다.
+  general/adult/audiobook/video 4개 스코프를 모두 순회해 하나의 리스트로 합쳐 반환합니다.
   (풀페이지 뷰인 index.html/script.js에서 한 번의 fetch로 전체 타임테이블을
   그릴 수 있도록 하기 위함)
 """
@@ -60,6 +60,7 @@ class ScanSchedulerMetadataProvider(BaseMetadataProvider):
         {"key": "general", "label": "일반 (general)"},
         {"key": "adult", "label": "성인 (adult)"},
         {"key": "audiobook", "label": "오디오북 (audiobook)"},
+        {"key": "video", "label": "비디오 (video)"},
     ]
 
     SCHEDULE_COLUMNS = (

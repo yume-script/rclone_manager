@@ -15,6 +15,7 @@
     general: '#3b82f6',
     adult: '#ec4899',
     audiobook: '#22c55e',
+    video: '#f97316',
   };
 
   // 그리드 뷰의 요일 컬럼 순서(월~일). dow는 cron 표준(0=일요일)의 값.
