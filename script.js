@@ -14,7 +14,7 @@
   const SCOPE_COLORS = {
     general: '#3b82f6',
     adult: '#ec4899',
-    audio: '#22c55e',
+    audiobook: '#22c55e',
   };
 
   // 그리드 뷰의 요일 컬럼 순서(월~일). dow는 cron 표준(0=일요일)의 값.
