@@ -702,7 +702,16 @@
         }
         allItems = Array.isArray(data.items) ? data.items : [];
         console.log(LOG_PREFIX, `2/3 데이터 파싱 완료 (${elapsed}s): 항목 ${allItems.length}개`);
-        if (status) status.style.display = 'none';
+        if (Array.isArray(data.errors) && data.errors.length > 0) {
+          console.warn(LOG_PREFIX, '일부 스코프 조회 실패:', data.errors);
+          if (status) {
+            status.style.display = 'block';
+            status.style.color = '#fca5a5';
+            status.textContent = `일부 스코프를 불러오지 못했습니다: ${data.errors.join(' / ')}`;
+          }
+        } else if (status) {
+          status.style.display = 'none';
+        }
         applyFilter();
         console.log(LOG_PREFIX, '3/3 렌더링 완료');
       })

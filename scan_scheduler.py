@@ -131,7 +131,10 @@ class ScanSchedulerMetadataProvider(BaseMetadataProvider):
                     "SELECT %s FROM libraries ORDER BY name" % self.SCHEDULE_COLUMNS
                 )
             except Exception as exc:  # noqa: BLE001 - 스코프 하나 실패해도 나머지는 계속 진행
-                errors.append("%s: %s" % (scope_key, exc))
+                err_msg = "%s: %s" % (scope_key, exc)
+                errors.append(err_msg)
+                # 서버 콘솔/로그에서 바로 원인을 확인할 수 있도록 출력
+                print("[scan_scheduler] get_dashboard_data 오류: %s" % err_msg)
                 rows = []
 
             for row in rows or []:
